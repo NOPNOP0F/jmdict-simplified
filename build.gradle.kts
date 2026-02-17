@@ -18,7 +18,7 @@ val jmdictExamplesReportFile = "jmdict-examples-release-info.md"
 val jmnedictLanguages = listOf("all") // There is only English
 val jmnedictReportFile = "jmnedict-release-info.md"
 
-val kanjidicLanguages = listOf("all", "en") // ISO 639-1, 2-letter codes
+val kanjidicLanguages = listOf("all", "en", "fr", "es", "pt") // ISO 639-1, 2-letter codes
 val kanjidicReportFile = "kanjidic-release-info.md"
 
 plugins {
