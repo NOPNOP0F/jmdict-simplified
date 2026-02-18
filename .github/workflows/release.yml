@@ -66,25 +66,6 @@ jobs:
       - name: Convert dictionaries
         if: env.SOMETHING_UPDATED == 'YES'
         run: ./gradlew convert
-      - name: Setup Node.js
-        if: env.SOMETHING_UPDATED == 'YES'
-        uses: actions/setup-node@v3
-        with:
-          node-version: 16.x
-      - name: Install NPM dependencies
-        if: env.SOMETHING_UPDATED == 'YES'
-        working-directory: node
-        run: npm ci
-      - name: Build Node packages
-        if: env.SOMETHING_UPDATED == 'YES'
-        working-directory: node
-        env:
-          NX_CLOUD_ACCESS_TOKEN: ${{ secrets.NX_CLOUD_ACCESS_TOKEN }}
-        run: npm run build
-      - name: Validate dictionary JSON files
-        if: env.SOMETHING_UPDATED == 'YES'
-        working-directory: node
-        run: npm run validate
       - name: Create archives
         if: env.SOMETHING_UPDATED == 'YES'
         run: ./gradlew archive
@@ -133,9 +114,6 @@ jobs:
           for f in ./build/distributions/*.zip; do
             mv $f ${f/$BUILD_VERSION_NUMBER/$BUILD_TAG}
           done
-          for f in ./build/distributions/*.tgz; do
-            mv $f ${f/$BUILD_VERSION_NUMBER/$BUILD_TAG}
-          done
       - name: Create release
         if: env.SOMETHING_UPDATED == 'YES' && !inputs.dry_run
         shell: bash
@@ -145,9 +123,6 @@ jobs:
           # collect assets
           assets=()
           for asset in ./build/distributions/*.zip; do
-            assets+=("$asset")
-          done
-          for asset in ./build/distributions/*.tgz; do
             assets+=("$asset")
           done
 
