@@ -27,11 +27,12 @@ class Kanjidic2ConvertingHandler(
     converter,
 ) {
     override fun beforeEntries(metadata: Kanjidic2Metadata) {
+        super.beforeEntries(metadata)
+
         converter.metadata = metadata
         outputs.forEach {
             it.write(
                 """
-                {
                 "version": ${Json.encodeToString(version)},
                 "languages": ${Json.encodeToString(it.languages.toList().sorted())},
                 "dictDate": ${Json.encodeToString(metadata.date)},

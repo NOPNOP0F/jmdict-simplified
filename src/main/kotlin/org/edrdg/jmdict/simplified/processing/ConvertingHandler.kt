@@ -19,6 +19,7 @@ open class ConvertingHandler<I : InputDictionaryEntry, O : OutputDictionaryEntry
     open val outputs: List<DictionaryOutputWriter>,
     open val converter: Converter<I, O, M>,
 ) : EventHandler<I, M> {
+
     override fun onStart() {
         println("Output directory: $outputDirectory")
         println()
@@ -30,10 +31,11 @@ open class ConvertingHandler<I : InputDictionaryEntry, O : OutputDictionaryEntry
     }
 
     override fun beforeEntries(metadata: M) {
+        // Start JSON object with entryCount placeholder
+        outputs.forEach { it.beginJsonObjectWithEntryCountPlaceholder() }
     }
 
     private val entriesByLanguage = mutableMapOf<String, Long>()
-
     private var entryCount: Long = 0L
 
     override fun onEntry(entry: I) {
@@ -55,19 +57,16 @@ open class ConvertingHandler<I : InputDictionaryEntry, O : OutputDictionaryEntry
     }
 
     override fun afterEntries() {
-        outputs.forEach {
-            val lang = it.languages.first()
-            val entries = if (lang == "all") entryCount else entriesByLanguage[lang]
-
+        outputs.forEach { out ->
+            val lang = out.languages.first()
+            val entries = if (lang == "all") entryCount else (entriesByLanguage[lang] ?: 0L)
             println("$lang has $entries entries.")
 
-            it.write(
-                """
-                ],
-                "entryCount": $entries
-                }
-                """.trimIndent()
-            )
+            // just close the array/object (no entryCount here anymore)
+            out.write("\n] }")
+
+            // patch entryCount at the top
+            out.patchEntryCount(entries)
         }
     }
 

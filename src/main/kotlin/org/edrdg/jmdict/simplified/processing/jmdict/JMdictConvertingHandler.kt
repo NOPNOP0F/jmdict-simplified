@@ -30,19 +30,20 @@ class JMdictConvertingHandler<I : InputDictionaryEntry, O : OutputDictionaryEntr
     converter,
 ) {
     override fun beforeEntries(metadata: JMdictMetadata) {
+        super.beforeEntries(metadata)
+
         converter.metadata = metadata
         outputs.forEach {
             it.write(
                 """
-                {
-                "version": ${Json.encodeToString(version)},
-                "languages": ${Json.encodeToString(it.languages.toList().sorted())},
-                "commonOnly": ${Json.encodeToString(it.commonOnly)},
-                "dictDate": ${Json.encodeToString(metadata.date)},
-                "dictRevisions": ${Json.encodeToString(metadata.revisions)},
-                "tags": ${Json.encodeToString(metadata.entities)},
-                "words": [
-                """.trimIndent().trimEnd('\n', ' ')
+            "version": ${Json.encodeToString(version)},
+            "languages": ${Json.encodeToString(it.languages.toList().sorted())},
+            "commonOnly": ${Json.encodeToString(it.commonOnly)},
+            "dictDate": ${Json.encodeToString(metadata.date)},
+            "dictRevisions": ${Json.encodeToString(metadata.revisions)},
+            "tags": ${Json.encodeToString(metadata.entities)},
+            "words": [
+            """.trimIndent().trimEnd('\n', ' ')
             )
         }
     }
