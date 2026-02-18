@@ -32,9 +32,20 @@ open class ConvertingHandler<I : InputDictionaryEntry, O : OutputDictionaryEntry
     override fun beforeEntries(metadata: M) {
     }
 
+    private val entriesByLanguage = mutableMapOf<String, Long>()
+
+    private var entryCount: Long = 0L
+
     override fun onEntry(entry: I) {
         val word = converter.convert(entry)
         val relevantOutputs = outputs.filter { it.acceptsEntry(word) }
+
+        entryCount += 1
+        entry.allLanguages.forEach { lang ->
+            entriesByLanguage.putIfAbsent(lang, 0L)
+            entriesByLanguage.computeIfPresent(lang) { _, n -> n + 1L }
+        }
+
         relevantOutputs.forEach { output ->
             val filteredWord = word.onlyWithLanguages(output.languages)
             val json = filteredWord.toJsonString()
@@ -45,9 +56,15 @@ open class ConvertingHandler<I : InputDictionaryEntry, O : OutputDictionaryEntry
 
     override fun afterEntries() {
         outputs.forEach {
+            val lang = it.languages.first()
+            val entries = if (lang == "all") entryCount else entriesByLanguage[lang]
+
+            println("$lang has $entries entries.")
+
             it.write(
                 """
-                ]
+                ],
+                "entryCount": $entries
                 }
                 """.trimIndent()
             )
