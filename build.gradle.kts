@@ -503,5 +503,5 @@ val tarAll: Task by tasks.creating {
 val archive: Task by tasks.creating {
     group = "Distribution"
     description = "Create archives of all JSON files"
-    dependsOn(zipAll, tarAll)
+    dependsOn(zipAll)
 }
